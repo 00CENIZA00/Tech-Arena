@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameByte — گیم و تک</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Vazirmatn:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-base:#232326; --bg-deep:#1b1b1e; --bg-raised:#2b2b2f;
+  --violet:#8b7bff; --teal:#3fe0c5; --amber:#f0b94d;
+  --ink:#eceef2; --ink-dim:#9898a3; --border-soft: rgba(255,255,255,0.07);
+  --font-display: 'Vazirmatn','Space Grotesk',sans-serif;
+  --font-body: 'Vazirmatn','Inter',sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{ background: var(--bg-base); color: var(--ink); font-family: var(--font-body); min-height:100vh; overflow-x:hidden; position:relative; }
+
+.terrain{ position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(255,255,255,0.035), transparent 60%),
+    radial-gradient(ellipse 50% 35% at 85% 25%, rgba(0,0,0,0.35), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 90%, rgba(255,255,255,0.025), transparent 60%),
+    var(--bg-base);
+}
+.terrain .blob{ position:absolute; border-radius:50%; background: linear-gradient(155deg, #2c2c30, #1e1e21);
+  box-shadow: -18px -18px 40px rgba(255,255,255,0.035), 22px 22px 55px rgba(0,0,0,0.55); }
+.blob.b1{ width:520px; height:520px; top:-140px; right:-120px; }
+.blob.b2{ width:340px; height:340px; top:55%; left:-110px; }
+.blob.b3{ width:260px; height:260px; bottom:-90px; right:18%; }
+.blob.b4{ width:180px; height:180px; top:18%; left:38%; opacity:0.6;}
+
+.glass{ position:relative; background: linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
+  backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid var(--border-soft); border-radius: 24px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset, 0 30px 60px -20px rgba(0,0,0,0.55); }
+.glass::before{ content:''; position:absolute; inset:-40px; z-index:-1; border-radius:40px;
+  background: radial-gradient(closest-side, rgba(139,123,255,0.16), rgba(63,224,197,0.10) 55%, transparent 75%);
+  filter: blur(28px); opacity:0.8; }
+
+.wrap{ position:relative; z-index:1; max-width:1120px; margin:0 auto; padding: 0 28px; }
+
+header.nav{ position:sticky; top:0; z-index:50; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  background: rgba(35,35,38,0.55); border-bottom: 1px solid var(--border-soft); }
+.nav-inner{ max-width:1120px; margin:0 auto; padding:18px 28px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.brand{ display:flex; align-items:center; gap:10px; font-family: var(--font-display); font-weight:700; font-size:1.25rem; cursor:pointer; }
+.brand .dot{ width:10px; height:10px; border-radius:50%; background: linear-gradient(135deg,var(--violet),var(--teal)); box-shadow:0 0 16px rgba(139,123,255,0.7);}
+.lang-toggle{ display:flex; background: rgba(255,255,255,0.05); border:1px solid var(--border-soft); border-radius:999px; padding:3px; gap:2px; }
+.lang-toggle button{ background:none; border:none; color:var(--ink-dim); font-family:var(--font-mono); font-size:0.75rem; padding:6px 12px; border-radius:999px; cursor:pointer;}
+.lang-toggle button.active{ background:var(--ink); color:var(--bg-deep); font-weight:700;}
+
+.rail{ position:fixed; top:50%; right:22px; transform:translateY(-50%); z-index:70; display:flex; flex-direction:column; gap:8px; padding:12px 8px; }
+.rail-btn{ position:relative; width:48px; height:48px; border-radius:16px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  background: rgba(255,255,255,0.03); color:var(--ink-dim); transition: all .2s ease; }
+.rail-btn svg{ width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.7; }
+.rail-btn:hover{ color:var(--ink); background: rgba(255,255,255,0.08); }
+.rail-btn.active{ color:#14141a; background: linear-gradient(135deg,var(--violet),var(--teal)); box-shadow:0 0 22px rgba(139,123,255,0.55);}
+.rail-btn .tip{ position:absolute; right:60px; top:50%; transform:translateY(-50%) translateX(6px);
+  background: rgba(20,20,23,0.92); color:var(--ink); font-family:var(--font-body); font-size:0.78rem;
+  padding:6px 12px; border-radius:8px; white-space:nowrap; opacity:0; pointer-events:none; transition: all .18s ease; border:1px solid var(--border-soft); }
+[dir="ltr"] .rail-btn .tip{ right:auto; left:60px; }
+.rail-btn:hover .tip{ opacity:1; transform:translateY(-50%) translateX(0); }
+@media (max-width: 860px){ .rail{ top:auto; bottom:18px; right:50%; transform:translateX(50%); flex-direction:row; } .rail-btn .tip{ display:none; } }
+
+main{ position:relative; z-index:1; }
+section.page{ display:none; padding: 64px 0 100px; }
+section.page.active{ display:block; animation: fadeIn .45s ease; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+
+.page-head{ margin-bottom: 34px; }
+.eyebrow{ font-family: var(--font-mono); color:var(--teal); font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+.eyebrow::before{ content:''; width:26px; height:1px; background:var(--teal);}
+.page-head h1{ font-family: var(--font-display); font-size: clamp(2.1rem, 3.6vw, 3rem); line-height:1.15; font-weight:800; }
+.page-head h1 .accent{ background: linear-gradient(120deg, var(--violet), var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.page-head p{ color:var(--ink-dim); font-size:1.02rem; line-height:1.8; margin-top:14px; max-width:56ch;}
+
+.grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:22px; }
+.card{ padding:20px; cursor:pointer; transition: transform .2s ease; display:flex; flex-direction:column; gap:10px;}
+.card:hover{ transform: translateY(-4px); }
+.card .cat{ font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.06em; text-transform:uppercase; padding:4px 10px; border-radius:999px; width:fit-content; }
+.cat.article{ color:var(--violet); background: rgba(139,123,255,0.12); }
+.cat.review{ color:var(--teal); background: rgba(63,224,197,0.12); }
+.cat.chat{ color:var(--amber); background: rgba(240,185,77,0.12); }
+.card h3{ font-family:var(--font-display); font-size:1.1rem; line-height:1.5;}
+.card p{ color:var(--ink-dim); font-size:0.87rem; line-height:1.7; flex:1;}
+.card .meta{ font-family:var(--font-mono); font-size:0.72rem; color:var(--ink-dim); display:flex; justify-content:space-between; margin-top:4px;}
+
+.article-detail{ padding:36px; max-width:760px; margin:0 auto; }
+.article-detail .cat{ display:inline-block; margin-bottom:16px;}
+.article-detail h1{ font-family:var(--font-display); font-size:2rem; line-height:1.35; margin-bottom:16px;}
+.article-detail .meta{ font-family:var(--font-mono); font-size:0.78rem; color:var(--ink-dim); margin-bottom:30px; display:flex; gap:18px;}
+.article-detail .body p{ color:#d6d6dd; line-height:2; margin-bottom:20px; font-size:1rem;}
+.back-link{ font-family:var(--font-mono); font-size:0.85rem; color:var(--teal); cursor:pointer; display:inline-flex; gap:8px; align-items:center; margin-bottom:26px;}
+
+footer{ position:relative; z-index:1; text-align:center; padding:40px 0; color:var(--ink-dim); font-family:var(--font-mono); font-size:0.78rem; border-top:1px solid var(--border-soft);}
+
+@media (max-width: 860px){ .grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div class="terrain">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+</div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand" onclick="railGo('home')"><span class="dot"></span><span data-i18n="brand">GameByte</span></div>
+    <div class="lang-toggle">
+      <button id="btn-fa" class="active" onclick="setLang('fa')">FA</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+</header>
+
+<nav class="glass rail" id="rail">
+  <button class="rail-btn active" data-page="home" onclick="railGo('home')">
+    <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg>
+    <span class="tip" data-i18n="nav.home">خانه</span>
+  </button>
+  <button class="rail-btn" data-page="articles" onclick="railGo('articles')">
+    <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M7 9h6M7 12.5h6M7 16h3"/></svg>
+    <span class="tip" data-i18n="nav.articles">مقالات و گفتگو</span>
+  </button>
+  <button class="rail-btn" data-page="reviews" onclick="railGo('reviews')">
+    <svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="9" rx="4.5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="15.5" cy="11" r="1"/><circle cx="18" cy="13.5" r="1"/></svg>
+    <span class="tip" data-i18n="nav.reviews">معرفی بازی</span>
+  </button>
+</nav>
+
+<main class="wrap">
+  <section class="page active" id="page-home">
+    <div class="page-head">
+      <div class="eyebrow" data-i18n="home.eyebrow">گیم × تکنولوژی</div>
+      <h1 data-i18n="home.title">آخرین فعالیت‌ها در دنیای <span class="accent">گیم و تک</span></h1>
+      <p data-i18n="home.lead">مقاله، گفتگو و معرفی بازی — همه‌جا با یه نگاه ساده و بی‌حاشیه.</p>
+    </div>
+    <div class="grid" id="home-grid"></div>
+  </section>
+
+  <section class="page" id="page-articles">
+    <div class="page-head"><h1 data-i18n="articles.title">مقالات و گفتگو</h1></div>
+    <div class="grid" id="articles-grid"></div>
+  </section>
+
+  <section class="page" id="page-reviews">
+    <div class="page-head"><h1 data-i18n="reviews.title">معرفی و بررسی بازی</h1></div>
+    <div class="grid" id="reviews-grid"></div>
+  </section>
+
+  <section class="page" id="page-detail">
+    <div class="glass article-detail" id="detail-content"></div>
+  </section>
+</main>
+
+<footer><span data-i18n="footer">© ۲۰۲۶ GameByte — ساخته‌شده با ❤ برای گیمرها و تک‌دوست‌ها</span></footer>
+
+<script>
+/* ✏️ برای اضافه/ویرایش محتوا: همینجا توی آرایه POSTS دست ببر.
+   type: 'article' | 'review' | 'chat'  (article/chat -> صفحه مقالات، review -> صفحه معرفی بازی)
+   فقط متن‌های داخل کوتیشن رو عوض کن. */
+const POSTS = [
+  { id:1, type:'review', image:'🎮',
+    fa:{ title:'۵ بازی ایندی که در سال ۲۰۲۶ نباید از دستشون بدید', excerpt:'وقتی همه حواس‌ها پیش عنوان‌های بزرگه، این بازی‌های ایندی دارن آروم‌آروم یه ژانر جدید می‌سازن.', date:'۲۹ تیر ۱۴۰۵', readTime:'۶ دقیقه',
+      body:['صنعت بازی‌های ایندی همیشه جایی بوده که ایده‌های جسورانه‌تر از استودیوهای بزرگ بیرون میان؛ چون بودجه کمتر یعنی ریسک بیشتر برای امتحان چیزهای تازه.',
+        'امسال چند تا از این عنوان‌ها با مکانیزم‌های غیرمعمول و روایت‌های شخصی‌تر توجه‌ها رو جلب کردن.',
+        'اگه دنبال یه تجربه‌ی متفاوت هستید، وقتشه یه نگاهی به این دسته از بازی‌ها بندازید.',
+        'خیلی از این استودیوهای کوچیک، از ابزارهای هوش مصنوعی برای تسریع تولید استفاده می‌کنن؛ همین زمان توسعه رو کوتاه‌تر کرده.'] },
+    en:{ title:'5 Indie Games You Shouldn\'t Miss in 2026', excerpt:'While all eyes are on the big titles, these indie games are quietly building a new genre.', date:'Jul 20, 2026', readTime:'6 min',
+      body:['Indie gaming has always been where bolder ideas emerge, since smaller budgets mean more room to experiment.',
+        'This year, several titles stood out for their unusual mechanics and personal storytelling.',
+        'If you want something different from the usual big-release cycle, this is a good place to look.',
+        'Many small studios now lean on AI tools to speed up production, cutting development time.'] } },
+  { id:2, type:'article', image:'🤖',
+    fa:{ title:'هوش مصنوعی چطور صنعت گیم رو متحول می‌کنه', excerpt:'از تولید محتوای پویا تا NPCهایی که واقعاً یاد می‌گیرن؛ نگاهی به تغییراتی که همین الان در حال وقوعه.', date:'۲۵ تیر ۱۴۰۵', readTime:'۸ دقیقه',
+      body:['دیگه صحبت از هوش مصنوعی در بازی‌سازی محدود به دشمن‌های هوشمند نیست.',
+        'یکی از جذاب‌ترین کاربردها، NPCهایی هستن که با مدل‌های زبانی گفت‌وگو می‌کنن.',
+        'استودیوها از هوش مصنوعی برای تست خودکار و پیدا کردن باگ هم استفاده می‌کنن.',
+        'این تغییرات نگرانی‌هایی هم درباره‌ی آینده‌ی شغلی هنرمندان ایجاد کرده.'] },
+    en:{ title:'How AI Is Reshaping the Gaming Industry', excerpt:'From dynamic content generation to NPCs that actually learn.', date:'Jul 16, 2026', readTime:'8 min',
+      body:['AI in game development is no longer just about smarter enemies.',
+        'One of the most interesting uses is NPCs powered by language models.',
+        'Studios also use AI for automated testing and bug detection.',
+        'These shifts raise real concerns about the future of artists and writers.'] } },
+  { id:3, type:'article', image:'🖥️',
+    fa:{ title:'راهنمای خرید یک PC گیمینگ اقتصادی در سال ۲۰۲۶', excerpt:'با بودجه محدود هم می‌شه یه سیستم قابل قبول برای گیم بست.', date:'۱۸ تیر ۱۴۰۵', readTime:'۷ دقیقه',
+      body:['ساخت یه PC گیمینگ اقتصادی همیشه درباره‌ی مصالحه‌ست.',
+        'کارت گرافیک معمولاً بیشترین سهم بودجه رو می‌گیره چون مستقیم روی فریم‌ریت اثر می‌ذاره.',
+        'پردازنده‌های نسل میانی معمولا کفایت می‌کنن، مگر قصد استریم داشته باشید.',
+        'رم و SSD رو دست‌کم نگیرید؛ ارتقای این دو حس کلی سیستم رو بهتر می‌کنه.'] },
+    en:{ title:'Budget Gaming PC Guide for 2026', excerpt:'A solid gaming rig is possible on a tight budget.', date:'Jul 9, 2026', readTime:'7 min',
+      body:['Building a budget gaming PC is always about trade-offs.',
+        'The graphics card usually deserves the biggest share of the budget.',
+        'Mid-tier processors are often plenty, unless you plan to stream.',
+        'Don\'t underestimate RAM and SSD storage — upgrades there feel noticeable.'] } }
+];
+
+const I18N = {
+  fa:{ brand:'GameByte', 'nav.home':'خانه', 'nav.articles':'مقالات و گفتگو', 'nav.reviews':'معرفی بازی',
+    'home.eyebrow':'گیم × تکنولوژی', 'home.title':'آخرین فعالیت‌ها در دنیای <span class="accent">گیم و تک</span>',
+    'home.lead':'مقاله، گفتگو و معرفی بازی — همه‌جا با یه نگاه ساده و بی‌حاشیه.',
+    'articles.title':'مقالات و گفتگو', 'reviews.title':'معرفی و بررسی بازی',
+    footer:'© ۲۰۲۶ GameByte — ساخته‌شده با ❤ برای گیمرها و تک‌دوست‌ها', back:'بازگشت',
+    article:'مقاله', review:'بررسی بازی', chat:'گفتگو' },
+  en:{ brand:'GameByte', 'nav.home':'Home', 'nav.articles':'Articles & Talks', 'nav.reviews':'Game Reviews',
+    'home.eyebrow':'Gaming × Tech', 'home.title':'Latest from the world of <span class="accent">gaming & tech</span>',
+    'home.lead':'Articles, interviews and game reviews — no clickbait, no hype.',
+    'articles.title':'Articles & Talks', 'reviews.title':'Game Reviews',
+    footer:'© 2026 GameByte — made with ❤ for gamers & tech lovers', back:'Back',
+    article:'Article', review:'Review', chat:'Interview' }
+};
+
+let currentLang = 'fa';
+function t(key){ return I18N[currentLang][key] || key; }
+
+function setLang(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+  document.getElementById('btn-fa').classList.toggle('active', lang==='fa');
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.getAttribute('data-i18n')); });
+  renderAll();
+}
+
+function goPage(name){
+  document.querySelectorAll('section.page').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function updateRailActive(name){
+  document.querySelectorAll('.rail-btn').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
+}
+function railGo(name){ goPage(name); updateRailActive(name); }
+function catLabel(type){ return t(type); }
+
+function cardHTML(post){
+  const c = post[currentLang];
+  return `<div class="glass card" onclick="openDetail(${post.id})">
+    <div style="font-size:1.8rem;">${post.image}</div>
+    <span class="cat ${post.type}">${catLabel(post.type)}</span>
+    <h3>${c.title}</h3>
+    <p>${c.excerpt}</p>
+    <div class="meta"><span>${c.date}</span><span>${c.readTime}</span></div>
+  </div>`;
+}
+
+let lastListPage = 'home';
+function renderAll(){
+  document.getElementById('home-grid').innerHTML = POSTS.map(cardHTML).join('');
+  document.getElementById('articles-grid').innerHTML = POSTS.filter(p=>p.type==='article'||p.type==='chat').map(cardHTML).join('');
+  document.getElementById('reviews-grid').innerHTML = POSTS.filter(p=>p.type==='review').map(cardHTML).join('');
+}
+
+function openDetail(id){
+  const activeSection = document.querySelector('section.page.active');
+  if(activeSection) lastListPage = activeSection.id.replace('page-','');
+  const post = POSTS.find(p=>p.id===id);
+  const c = post[currentLang];
+  document.getElementById('detail-content').innerHTML = `
+    <span class="back-link" onclick="backToList()">← ${t('back')}</span>
+    <span class="cat ${post.type}">${catLabel(post.type)}</span>
+    <h1>${c.title}</h1>
+    <div class="meta"><span>${c.date}</span><span>${c.readTime}</span></div>
+    <div class="body">${c.body.map(p=>`<p>${p}</p>`).join('')}</div>
+  `;
+  goPage('detail');
+}
+function backToList(){ goPage(lastListPage); updateRailActive(lastListPage); }
+
+renderAll();
+</script>
+</body>
+</html>
