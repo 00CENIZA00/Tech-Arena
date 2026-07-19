@@ -98,7 +98,11 @@ section.page.active{ display:block; animation: fadeIn .45s ease; }
 footer{ position:relative; z-index:1; text-align:center; padding:40px 0; color:var(--ink-dim); font-family:var(--font-mono); font-size:0.78rem; border-top:1px solid var(--border-soft);}
 
 @media (max-width: 860px){ .grid{ grid-template-columns:1fr; } }
+
+.auth-card{max-width:560px;margin:0 auto;padding:30px}.auth-card form,.admin-form{display:flex;flex-direction:column;gap:14px}.auth-card input,.admin-form input,.admin-form textarea,.admin-form select{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border-soft);border-radius:12px;padding:13px;color:var(--ink);font:inherit}.admin-form textarea{min-height:120px;resize:vertical}.primary-btn,.secondary-btn,.admin-item button{border:0;border-radius:12px;padding:12px 16px;font:inherit;cursor:pointer}.primary-btn{background:linear-gradient(135deg,var(--violet),var(--teal));color:#111}.secondary-btn{background:rgba(255,255,255,.08);color:var(--ink);margin-top:12px}.status{color:var(--ink-dim);margin-top:12px;line-height:1.8}.admin-layout{display:grid;grid-template-columns:1fr 1fr;gap:22px}.admin-form,.admin-list{padding:22px}.admin-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-soft)}.admin-item button{padding:7px 10px;background:rgba(255,255,255,.08);color:var(--ink);margin-inline-start:6px}.post-image{width:100%;height:150px;object-fit:cover;border-radius:16px}.detail-image{width:100%;max-height:380px;object-fit:cover;border-radius:18px;margin:14px 0 24px}.cat.news{color:#ff9f68;background:rgba(255,159,104,.12)}.cat.game{color:#78b7ff;background:rgba(120,183,255,.12)}
+@media(max-width:860px){.admin-layout{grid-template-columns:1fr}.wrap{padding:0 16px}.nav-inner{padding:14px 16px}.page{padding-top:40px!important}.rail{max-width:calc(100vw - 24px);overflow-x:auto}.rail-btn{flex:0 0 46px}}
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -117,18 +121,13 @@ footer{ position:relative; z-index:1; text-align:center; padding:40px 0; color:v
 </header>
 
 <nav class="glass rail" id="rail">
-  <button class="rail-btn active" data-page="home" onclick="railGo('home')">
-    <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg>
-    <span class="tip" data-i18n="nav.home">خانه</span>
-  </button>
-  <button class="rail-btn" data-page="articles" onclick="railGo('articles')">
-    <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M7 9h6M7 12.5h6M7 16h3"/></svg>
-    <span class="tip" data-i18n="nav.articles">مقالات و گفتگو</span>
-  </button>
-  <button class="rail-btn" data-page="reviews" onclick="railGo('reviews')">
-    <svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="9" rx="4.5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="15.5" cy="11" r="1"/><circle cx="18" cy="13.5" r="1"/></svg>
-    <span class="tip" data-i18n="nav.reviews">معرفی بازی</span>
-  </button>
+  <button class="rail-btn active" data-page="home" onclick="railGo('home')"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h5v-5h2v5h5v-9"/></svg><span class="tip" data-i18n="nav.home">خانه</span></button>
+  <button class="rail-btn" data-page="news" onclick="railGo('news')"><svg viewBox="0 0 24 24"><path d="M4 5.5h16v13H4z"/><path d="M7 9h10M7 12h7M7 15h5"/></svg><span class="tip" data-i18n="nav.news">اخبار</span></button>
+  <button class="rail-btn" data-page="games" onclick="railGo('games')"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="9" rx="4.5"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="15.5" cy="11" r="1"/><circle cx="18" cy="13.5" r="1"/></svg><span class="tip" data-i18n="nav.games">معرفی بازی</span></button>
+  <button class="rail-btn" data-page="reviews" onclick="railGo('reviews')"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/></svg><span class="tip" data-i18n="nav.reviews">بررسی بازی</span></button>
+  <button class="rail-btn" data-page="articles" onclick="railGo('articles')"><svg viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg><span class="tip" data-i18n="nav.articles">مقالات</span></button>
+  <button class="rail-btn" data-page="account" onclick="railGo('account')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.5 3.1-5.5 7-5.5s6.2 2 7 5.5"/></svg><span class="tip" data-i18n="nav.account">حساب</span></button>
+  <button class="rail-btn admin-only" data-page="admin" onclick="railGo('admin')" style="display:none"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.3 8.2-8 10-4.7-1.8-8-5-8-10V6z"/><path d="m9 12 2 2 4-4"/></svg><span class="tip" data-i18n="nav.admin">پنل ادمین</span></button>
 </nav>
 
 <main class="wrap">
@@ -151,6 +150,13 @@ footer{ position:relative; z-index:1; text-align:center; padding:40px 0; color:v
     <div class="grid" id="reviews-grid"></div>
   </section>
 
+  <section class="page" id="page-news"><div class="page-head"><h1 data-i18n="news.title">اخبار</h1><p data-i18n="news.lead">آخرین خبرهای دنیای بازی و تکنولوژی.</p></div><div class="grid" id="news-grid"></div></section>
+  <section class="page" id="page-games"><div class="page-head"><h1 data-i18n="games.title">معرفی بازی</h1><p>بازی‌هایی که ارزش تجربه کردن دارند.</p></div><div class="grid" id="games-grid"></div></section>
+  <section class="page" id="page-reviews"><div class="page-head"><h1 data-i18n="reviews.title">بررسی بازی</h1><p>بررسی و تحلیل بازی‌ها.</p></div><div class="grid" id="reviews-grid"></div></section>
+  <section class="page" id="page-articles"><div class="page-head"><h1 data-i18n="articles.title">مقالات</h1><p>مقاله‌های گیم، تکنولوژی و دنیای دیجیتال.</p></div><div class="grid" id="articles-grid"></div></section>
+  <section class="page" id="page-account"><div class="glass auth-card"><div class="page-head"><div class="eyebrow">ACCOUNT</div><h1 id="auth-title">ورود به حساب</h1></div><form id="auth-form"><input id="auth-username" required placeholder="نام کاربری"><input id="auth-password" required type="password" placeholder="رمز عبور"><button class="primary-btn" type="submit">ورود</button></form><button class="secondary-btn" id="toggle-auth" onclick="toggleAuthMode()">ساخت حساب جدید</button><p id="auth-status" class="status"></p><div id="user-panel" style="display:none"><h3 id="user-name"></h3><button class="secondary-btn" onclick="logout()">خروج از حساب</button></div></div></section>
+  <section class="page" id="page-admin"><div class="page-head"><div class="eyebrow">ADMIN PANEL</div><h1>پنل مدیریت</h1><p>انتشار، ویرایش و حذف محتوای سایت.</p></div><div class="admin-layout"><form class="glass admin-form" id="post-form"><input type="hidden" id="edit-id"><input id="post-title" required placeholder="عنوان محتوا"><textarea id="post-excerpt" required placeholder="توضیح کوتاه"></textarea><select id="post-type"><option value="news">اخبار</option><option value="game">معرفی بازی</option><option value="review">بررسی بازی</option><option value="article">مقالات</option></select><input id="post-image" type="file" accept="image/*"><textarea id="post-body" required placeholder="متن محتوا"></textarea><button class="primary-btn" type="submit">انتشار / ذخیره</button><button class="secondary-btn" type="button" onclick="resetPostForm()">پاک کردن فرم</button><p id="admin-status" class="status"></p></form><div class="glass admin-list"><h2>محتواهای منتشرشده</h2><div id="admin-posts"></div></div></div></section>
+
   <section class="page" id="page-detail">
     <div class="glass article-detail" id="detail-content"></div>
   </section>
@@ -159,119 +165,45 @@ footer{ position:relative; z-index:1; text-align:center; padding:40px 0; color:v
 <footer><span data-i18n="footer">© ۲۰۲۶ GameByte — ساخته‌شده با ❤ برای گیمرها و تک‌دوست‌ها</span></footer>
 
 <script>
-/* ✏️ برای اضافه/ویرایش محتوا: همینجا توی آرایه POSTS دست ببر.
-   type: 'article' | 'review' | 'chat'  (article/chat -> صفحه مقالات، review -> صفحه معرفی بازی)
-   فقط متن‌های داخل کوتیشن رو عوض کن. */
+/* GameByte CMS: Supabase-backed auth and content management.
+   1) Create a Supabase project.
+   2) Run the SQL shown in the setup note below.
+   3) Replace SUPABASE_URL and SUPABASE_ANON_KEY.
+*/
+const SUPABASE_URL = 'https://hlkafamwgvqmgemaiwnw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_02Cn1r1xFOH8cfYhI4xrqA_xPeur87u';const sb = (SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const ADMIN_USERNAME = 'masein';
 const POSTS = [
-  { id:1, type:'review', image:'🎮',
-    fa:{ title:'۵ بازی ایندی که در سال ۲۰۲۶ نباید از دستشون بدید', excerpt:'وقتی همه حواس‌ها پیش عنوان‌های بزرگه، این بازی‌های ایندی دارن آروم‌آروم یه ژانر جدید می‌سازن.', date:'۲۹ تیر ۱۴۰۵', readTime:'۶ دقیقه',
-      body:['صنعت بازی‌های ایندی همیشه جایی بوده که ایده‌های جسورانه‌تر از استودیوهای بزرگ بیرون میان؛ چون بودجه کمتر یعنی ریسک بیشتر برای امتحان چیزهای تازه.',
-        'امسال چند تا از این عنوان‌ها با مکانیزم‌های غیرمعمول و روایت‌های شخصی‌تر توجه‌ها رو جلب کردن.',
-        'اگه دنبال یه تجربه‌ی متفاوت هستید، وقتشه یه نگاهی به این دسته از بازی‌ها بندازید.',
-        'خیلی از این استودیوهای کوچیک، از ابزارهای هوش مصنوعی برای تسریع تولید استفاده می‌کنن؛ همین زمان توسعه رو کوتاه‌تر کرده.'] },
-    en:{ title:'5 Indie Games You Shouldn\'t Miss in 2026', excerpt:'While all eyes are on the big titles, these indie games are quietly building a new genre.', date:'Jul 20, 2026', readTime:'6 min',
-      body:['Indie gaming has always been where bolder ideas emerge, since smaller budgets mean more room to experiment.',
-        'This year, several titles stood out for their unusual mechanics and personal storytelling.',
-        'If you want something different from the usual big-release cycle, this is a good place to look.',
-        'Many small studios now lean on AI tools to speed up production, cutting development time.'] } },
-  { id:2, type:'article', image:'🤖',
-    fa:{ title:'هوش مصنوعی چطور صنعت گیم رو متحول می‌کنه', excerpt:'از تولید محتوای پویا تا NPCهایی که واقعاً یاد می‌گیرن؛ نگاهی به تغییراتی که همین الان در حال وقوعه.', date:'۲۵ تیر ۱۴۰۵', readTime:'۸ دقیقه',
-      body:['دیگه صحبت از هوش مصنوعی در بازی‌سازی محدود به دشمن‌های هوشمند نیست.',
-        'یکی از جذاب‌ترین کاربردها، NPCهایی هستن که با مدل‌های زبانی گفت‌وگو می‌کنن.',
-        'استودیوها از هوش مصنوعی برای تست خودکار و پیدا کردن باگ هم استفاده می‌کنن.',
-        'این تغییرات نگرانی‌هایی هم درباره‌ی آینده‌ی شغلی هنرمندان ایجاد کرده.'] },
-    en:{ title:'How AI Is Reshaping the Gaming Industry', excerpt:'From dynamic content generation to NPCs that actually learn.', date:'Jul 16, 2026', readTime:'8 min',
-      body:['AI in game development is no longer just about smarter enemies.',
-        'One of the most interesting uses is NPCs powered by language models.',
-        'Studios also use AI for automated testing and bug detection.',
-        'These shifts raise real concerns about the future of artists and writers.'] } },
-  { id:3, type:'article', image:'🖥️',
-    fa:{ title:'راهنمای خرید یک PC گیمینگ اقتصادی در سال ۲۰۲۶', excerpt:'با بودجه محدود هم می‌شه یه سیستم قابل قبول برای گیم بست.', date:'۱۸ تیر ۱۴۰۵', readTime:'۷ دقیقه',
-      body:['ساخت یه PC گیمینگ اقتصادی همیشه درباره‌ی مصالحه‌ست.',
-        'کارت گرافیک معمولاً بیشترین سهم بودجه رو می‌گیره چون مستقیم روی فریم‌ریت اثر می‌ذاره.',
-        'پردازنده‌های نسل میانی معمولا کفایت می‌کنن، مگر قصد استریم داشته باشید.',
-        'رم و SSD رو دست‌کم نگیرید؛ ارتقای این دو حس کلی سیستم رو بهتر می‌کنه.'] },
-    en:{ title:'Budget Gaming PC Guide for 2026', excerpt:'A solid gaming rig is possible on a tight budget.', date:'Jul 9, 2026', readTime:'7 min',
-      body:['Building a budget gaming PC is always about trade-offs.',
-        'The graphics card usually deserves the biggest share of the budget.',
-        'Mid-tier processors are often plenty, unless you plan to stream.',
-        'Don\'t underestimate RAM and SSD storage — upgrades there feel noticeable.'] } }
+{id:1,type:'review',image:'🎮',fa:{title:'۵ بازی ایندی که در سال ۲۰۲۶ نباید از دستشون بدید',excerpt:'وقتی همه حواس‌ها پیش عنوان‌های بزرگه، این بازی‌های ایندی دارن آروم‌آروم یه ژانر جدید می‌سازن.',date:'۲۹ تیر ۱۴۰۵',readTime:'۶ دقیقه',body:['صنعت بازی‌های ایندی همیشه جایی بوده که ایده‌های جسورانه‌تر از استودیوهای بزرگ بیرون میان.']},en:{title:'5 Indie Games You Shouldn’t Miss in 2026',excerpt:'These indie games are quietly building a new genre.',date:'Jul 20, 2026',readTime:'6 min',body:['Indie gaming is where bold ideas often emerge.']}}
 ];
-
-const I18N = {
-  fa:{ brand:'GameByte', 'nav.home':'خانه', 'nav.articles':'مقالات و گفتگو', 'nav.reviews':'معرفی بازی',
-    'home.eyebrow':'گیم × تکنولوژی', 'home.title':'آخرین فعالیت‌ها در دنیای <span class="accent">گیم و تک</span>',
-    'home.lead':'مقاله، گفتگو و معرفی بازی — همه‌جا با یه نگاه ساده و بی‌حاشیه.',
-    'articles.title':'مقالات و گفتگو', 'reviews.title':'معرفی و بررسی بازی',
-    footer:'© ۲۰۲۶ GameByte — ساخته‌شده با ❤ برای گیمرها و تک‌دوست‌ها', back:'بازگشت',
-    article:'مقاله', review:'بررسی بازی', chat:'گفتگو' },
-  en:{ brand:'GameByte', 'nav.home':'Home', 'nav.articles':'Articles & Talks', 'nav.reviews':'Game Reviews',
-    'home.eyebrow':'Gaming × Tech', 'home.title':'Latest from the world of <span class="accent">gaming & tech</span>',
-    'home.lead':'Articles, interviews and game reviews — no clickbait, no hype.',
-    'articles.title':'Articles & Talks', 'reviews.title':'Game Reviews',
-    footer:'© 2026 GameByte — made with ❤ for gamers & tech lovers', back:'Back',
-    article:'Article', review:'Review', chat:'Interview' }
-};
-
-let currentLang = 'fa';
-function t(key){ return I18N[currentLang][key] || key; }
-
-function setLang(lang){
-  currentLang = lang;
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
-  document.getElementById('btn-fa').classList.toggle('active', lang==='fa');
-  document.getElementById('btn-en').classList.toggle('active', lang==='en');
-  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.getAttribute('data-i18n')); });
-  renderAll();
-}
-
-function goPage(name){
-  document.querySelectorAll('section.page').forEach(s=>s.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-function updateRailActive(name){
-  document.querySelectorAll('.rail-btn').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
-}
-function railGo(name){ goPage(name); updateRailActive(name); }
-function catLabel(type){ return t(type); }
-
-function cardHTML(post){
-  const c = post[currentLang];
-  return `<div class="glass card" onclick="openDetail(${post.id})">
-    <div style="font-size:1.8rem;">${post.image}</div>
-    <span class="cat ${post.type}">${catLabel(post.type)}</span>
-    <h3>${c.title}</h3>
-    <p>${c.excerpt}</p>
-    <div class="meta"><span>${c.date}</span><span>${c.readTime}</span></div>
-  </div>`;
-}
-
-let lastListPage = 'home';
-function renderAll(){
-  document.getElementById('home-grid').innerHTML = POSTS.map(cardHTML).join('');
-  document.getElementById('articles-grid').innerHTML = POSTS.filter(p=>p.type==='article'||p.type==='chat').map(cardHTML).join('');
-  document.getElementById('reviews-grid').innerHTML = POSTS.filter(p=>p.type==='review').map(cardHTML).join('');
-}
-
-function openDetail(id){
-  const activeSection = document.querySelector('section.page.active');
-  if(activeSection) lastListPage = activeSection.id.replace('page-','');
-  const post = POSTS.find(p=>p.id===id);
-  const c = post[currentLang];
-  document.getElementById('detail-content').innerHTML = `
-    <span class="back-link" onclick="backToList()">← ${t('back')}</span>
-    <span class="cat ${post.type}">${catLabel(post.type)}</span>
-    <h1>${c.title}</h1>
-    <div class="meta"><span>${c.date}</span><span>${c.readTime}</span></div>
-    <div class="body">${c.body.map(p=>`<p>${p}</p>`).join('')}</div>
-  `;
-  goPage('detail');
-}
-function backToList(){ goPage(lastListPage); updateRailActive(lastListPage); }
-
-renderAll();
+let currentLang='fa', authMode='login', currentUser=null, remotePosts=[];
+const I18N={fa:{brand:'GameByte','nav.home':'خانه','nav.news':'اخبار','nav.games':'معرفی بازی','nav.reviews':'بررسی بازی','nav.articles':'مقالات','nav.account':'حساب','nav.admin':'پنل ادمین','home.eyebrow':'گیم × تکنولوژی','home.title':'آخرین فعالیت‌ها در دنیای <span class="accent">گیم و تک</span>','home.lead':'خبر، مقاله، معرفی و بررسی بازی — همه‌جا با یه نگاه ساده و بی‌حاشیه.','news.title':'اخبار','games.title':'معرفی بازی','reviews.title':'بررسی بازی','articles.title':'مقالات',footer:'© ۲۰۲۶ GameByte — ساخته‌شده با ❤ برای گیمرها و تک‌دوست‌ها',back:'بازگشت',news:'خبر',game:'معرفی بازی',review:'بررسی بازی',article:'مقاله'},en:{brand:'GameByte','nav.home':'Home','nav.news':'News','nav.games':'Game Introductions','nav.reviews':'Game Reviews','nav.articles':'Articles','nav.account':'Account','nav.admin':'Admin Panel','home.eyebrow':'Gaming × Tech','home.title':'Latest from the world of <span class="accent">gaming & tech</span>','home.lead':'News, articles, introductions and reviews — clean and simple.',news:'News',game:'Game Intro',review:'Review',article:'Article',back:'Back',footer:'© 2026 GameByte — made with ❤ for gamers & tech lovers'}};
+function t(k){return I18N[currentLang][k]||k}
+function setLang(lang){currentLang=lang;document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';document.getElementById('btn-fa').classList.toggle('active',lang==='fa');document.getElementById('btn-en').classList.toggle('active',lang==='en');document.querySelectorAll('[data-i18n]').forEach(e=>e.innerHTML=t(e.dataset.i18n));renderAll()}
+function goPage(n){document.querySelectorAll('section.page').forEach(s=>s.classList.remove('active'));document.getElementById('page-'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function updateRailActive(n){document.querySelectorAll('.rail-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===n))}
+function railGo(n){if(n==='admin'&&!isAdmin()){goPage('account');updateRailActive('account');return}goPage(n);updateRailActive(n)}
+function catLabel(type){return t(type)}
+function allPosts(){return [...remotePosts,...POSTS]}
+function cardHTML(p){const c=p[currentLang]||p.fa||p;return `<div class="glass card" onclick="openDetail('${p.id}')">${p.image?`<img class="post-image" src="${p.image}" onerror="this.style.display='none'">`:''}<span class="cat ${p.type}">${catLabel(p.type)}</span><h3>${c.title}</h3><p>${c.excerpt}</p><div class="meta"><span>${c.date||''}</span><span>${c.readTime||''}</span></div></div>`}
+function renderAll(){const ps=allPosts();document.getElementById('home-grid').innerHTML=ps.map(cardHTML).join('');document.getElementById('news-grid').innerHTML=ps.filter(p=>p.type==='news').map(cardHTML).join('');document.getElementById('games-grid').innerHTML=ps.filter(p=>p.type==='game').map(cardHTML).join('');document.getElementById('reviews-grid').innerHTML=ps.filter(p=>p.type==='review').map(cardHTML).join('');document.getElementById('articles-grid').innerHTML=ps.filter(p=>p.type==='article').map(cardHTML).join('');renderAdminPosts()}
+function openDetail(id){const p=allPosts().find(x=>String(x.id)===String(id));if(!p)return;const c=p[currentLang]||p.fa||p;document.getElementById('detail-content').innerHTML=`<span class="back-link" onclick="backToList()">← ${t('back')}</span><span class="cat ${p.type}">${catLabel(p.type)}</span>${p.image?`<img class="detail-image" src="${p.image}">`:''}<h1>${c.title}</h1><div class="meta"><span>${c.date||''}</span><span>${c.readTime||''}</span></div><div class="body">${(Array.isArray(c.body)?c.body:[c.body]).map(x=>`<p>${x}</p>`).join('')}</div>`;goPage('detail')}
+function backToList(){goPage('home');updateRailActive('home')}
+function usernameEmail(u){return u.trim().toLowerCase().replace(/[^a-z0-9_]/g,'')+'@gamebyte.local'}
+function isAdmin(){return currentUser?.username===ADMIN_USERNAME}
+function toggleAuthMode(){authMode=authMode==='login'?'signup':'login';document.getElementById('auth-title').textContent=authMode==='login'?'ورود به حساب':'ساخت حساب جدید';document.querySelector('#auth-form button').textContent=authMode==='login'?'ورود':'ثبت‌نام';document.getElementById('toggle-auth').textContent=authMode==='login'?'ساخت حساب جدید':'قبلاً حساب دارم'}
+async function authSubmit(e){e.preventDefault();const u=document.getElementById('auth-username').value.trim();const p=document.getElementById('auth-password').value;const status=document.getElementById('auth-status');if(!sb){status.textContent='اول کلیدهای Supabase را داخل فایل وارد کن.';return}try{let result;if(authMode==='signup')result=await sb.auth.signUp({email:usernameEmail(u),password:p,options:{data:{username:u}}});else result=await sb.auth.signInWithPassword({email:usernameEmail(u),password:p});if(result.error)throw result.error;currentUser={id:result.data.user.id,username:result.data.user.user_metadata.username||u};status.textContent=authMode==='signup'?'حساب ساخته شد.':'با موفقیت وارد شدی.';updateAuthUI();await loadRemotePosts()}catch(err){status.textContent=err.message}}
+async function logout(){if(sb)await sb.auth.signOut();currentUser=null;updateAuthUI();goPage('home');updateRailActive('home')}
+function updateAuthUI(){const admin=document.querySelector('.admin-only');admin.style.display=isAdmin()?'flex':'none';document.getElementById('auth-form').style.display=currentUser?'none':'flex';document.getElementById('toggle-auth').style.display=currentUser?'none':'block';document.getElementById('user-panel').style.display=currentUser?'block':'none';if(currentUser)document.getElementById('user-name').textContent='سلام '+currentUser.username+' 👋'}
+async function loadSession(){if(!sb){updateAuthUI();return}const {data}=await sb.auth.getSession();if(data.session){const u=data.session.user;currentUser={id:u.id,username:u.user_metadata.username||u.email.split('@')[0]};}updateAuthUI();await loadRemotePosts()}
+async function loadRemotePosts(){if(!sb)return;const {data,error}=await sb.from('posts').select('*').order('created_at',{ascending:false});if(!error)remotePosts=data.map(p=>({id:p.id,type:p.type,image:p.image_url,fa:{title:p.title,excerpt:p.excerpt,date:new Date(p.created_at).toLocaleDateString('fa-IR'),readTime:'',body:p.body},en:{title:p.title,excerpt:p.excerpt,date:new Date(p.created_at).toLocaleDateString('en-US'),readTime:'',body:p.body}}));renderAll()}
+async function uploadImage(file){if(!file||!sb)return null;const path=`${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g,'-')}`;const up=await sb.storage.from('post-images').upload(path,file,{upsert:false});if(up.error)throw up.error;return sb.storage.from('post-images').getPublicUrl(path).data.publicUrl}
+async function savePost(e){e.preventDefault();if(!isAdmin())return;const status=document.getElementById('admin-status');try{const id=document.getElementById('edit-id').value;const file=document.getElementById('post-image').files[0];let image=await uploadImage(file);const payload={title:document.getElementById('post-title').value,excerpt:document.getElementById('post-excerpt').value,type:document.getElementById('post-type').value,body:document.getElementById('post-body').value};if(image)payload.image_url=image;if(id){const {error}=await sb.from('posts').update(payload).eq('id',id);if(error)throw error}else{payload.author_id=currentUser.id;const {error}=await sb.from('posts').insert(payload);if(error)throw error}status.textContent='با موفقیت ذخیره شد.';resetPostForm();await loadRemotePosts()}catch(err){status.textContent=err.message}}
+function resetPostForm(){document.getElementById('post-form').reset();document.getElementById('edit-id').value=''}
+function renderAdminPosts(){const el=document.getElementById('admin-posts');if(!el)return;el.innerHTML=remotePosts.map(p=>`<div class="admin-item"><b>${p.fa.title}</b><div><button onclick="editPost('${p.id}')">ویرایش</button><button onclick="deletePost('${p.id}')">حذف</button></div></div>`).join('')||'<p class="status">هنوز محتوایی منتشر نشده.</p>'}
+function editPost(id){const p=remotePosts.find(x=>String(x.id)===String(id));if(!p)return;document.getElementById('edit-id').value=p.id;document.getElementById('post-title').value=p.fa.title;document.getElementById('post-excerpt').value=p.fa.excerpt;document.getElementById('post-type').value=p.type;document.getElementById('post-body').value=p.fa.body;goPage('admin');updateRailActive('admin')}
+async function deletePost(id){if(!isAdmin()||!confirm('این محتوا حذف شود؟'))return;const {error}=await sb.from('posts').delete().eq('id',id);if(error)alert(error.message);else await loadRemotePosts()}
+document.getElementById('auth-form').addEventListener('submit',authSubmit);document.getElementById('post-form').addEventListener('submit',savePost);renderAll();loadSession();
 </script>
 </body>
 </html>
